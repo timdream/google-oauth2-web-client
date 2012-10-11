@@ -15,17 +15,19 @@
       requesting.
   GO2.getToken(callback)
     Send access token to the callback function as the first argument.
-    If not logged in this triggers login popup and execute login after logged in.
-    Be sure to call this function in user-triggered event (such as click) to prevent popup blocker.
+    If not logged in this triggers login popup and execute login after
+    logged in.
+    Be sure to call this function in user-triggered event (such as click) to
+    prevent popup blocker.
     If not sure do use isLoggedIn() below to check first.
   GO2.isLoggedIn()
     boolean
 
 */
 
-"use strict";
+'use strict';
 
-(function (w) {
+(function(w) {
 
   var windowName = 'google_oauth2_login_popup';
 
@@ -51,13 +53,16 @@
 
   var client_id,
   scope = 'https://www.googleapis.com/auth/plus.me',
-  redirect_uri = w.location.href.substr(0, w.location.href.length - w.location.hash.length).replace(/#$/, ''),
+  redirect_uri = w.location.href.substr(0,
+                                        w.location.href.length -
+                                        w.location.hash.length)
+                                .replace(/#$/, ''),
   access_token,
   callbackWaitForToken;
 
   w.GO2 = {
     // init
-    init: function (options) {
+    init: function(options) {
       if (!options.client_id)
         return false;
 
@@ -79,12 +84,12 @@
       return true;
     },
     // receive token from popup
-    receiveToken: function (token, expires_in) {
+    receiveToken: function(token, expires_in) {
       if (token !== 'ERROR') {
         access_token = token;
         if (callbackWaitForToken) callbackWaitForToken(access_token);
         setTimeout(
-          function () {
+          function() {
             access_token = undefined;
           },
           expires_in * 1000
@@ -94,13 +99,13 @@
       }
     },
     // boolean, indicate logged in or not
-    isLoggedIn: function () {
+    isLoggedIn: function() {
       return !!access_token;
     },
     // pass the access token to callback
     // if not logged in this triggers login popup;
     // use isLoggedIn to check login first to prevent popup blocker
-    getToken: function (callback) {
+    getToken: function(callback) {
       if (!client_id || !redirect_uri || !scope) {
         alert('You need init() first. Check the program flow.');
         return false;
@@ -108,11 +113,11 @@
       if (!access_token) {
         callbackWaitForToken = callback;
         w.open(
-          'https://accounts.google.com/o/oauth2/auth'
-          + '?response_type=token'
-          + '&redirect_uri=' + encodeURIComponent(redirect_uri)
-          + '&scope=' + encodeURIComponent(scope)
-          + '&client_id=' + encodeURIComponent(client_id),
+          'https://accounts.google.com/o/oauth2/auth' +
+          '?response_type=token' +
+          '&redirect_uri=' + encodeURIComponent(redirect_uri) +
+          '&scope=' + encodeURIComponent(scope) +
+          '&client_id=' + encodeURIComponent(client_id),
           windowName,
           'width=400,height=360'
         );
