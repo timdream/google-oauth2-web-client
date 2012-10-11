@@ -9,6 +9,7 @@ This library is a spin-off project from [HTML5 Word Cloud](https://github.com/ti
 ### Why not use [library supplied by Google](https://code.google.com/p/google-api-javascript-client/wiki/Authentication) and reinvent the wheel?
 
 Because I can; also because the library is light-weighted and transparent to me.
+For some reason, I cannot get `auth` library to load without getting the entire client library; onload callback never fires.
 
 You are very welcome to use the library from Google since it will be better supported.
 
