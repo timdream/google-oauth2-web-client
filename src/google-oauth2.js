@@ -24,27 +24,27 @@
 
   var windowName = 'google_oauth2_login_popup';
 
-  if (window.name === windowName) {
+  if (w.name === windowName) {
     if (
-      window.opener &&
-      window.opener.GO2
+      w.opener &&
+      w.opener.GO2
     ) {
-      if (window.location.hash.indexOf('access_token') !== -1) {
-        window.opener.GO2.receiveToken(
-          window.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
-          parseInt(window.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1'))
+      if (w.location.hash.indexOf('access_token') !== -1) {
+        w.opener.GO2.receiveToken(
+          w.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
+          parseInt(w.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1'))
         );
       }
-      if (window.location.search.indexOf('error=')) {
-        window.opener.GO2.receiveToken('ERROR');
+      if (w.location.search.indexOf('error=')) {
+        w.opener.GO2.receiveToken('ERROR');
       }
     }
-    window.close();
+    w.close();
   }
 
   var client_id,
   scope = 'https://www.googleapis.com/auth/plus.me',
-  redirect_uri = window.location.href.substr(0, window.location.href.length - window.location.hash.length).replace(/#$/, ''),
+  redirect_uri = w.location.href.substr(0, w.location.href.length - w.location.hash.length).replace(/#$/, ''),
   access_token,
   callbackWaitForToken;
 
@@ -84,7 +84,7 @@
       }
       if (!access_token) {
         callbackWaitForToken = callback;
-        window.open(
+        w.open(
           'https://accounts.google.com/o/oauth2/auth'
           + '?response_type=token'
           + '&redirect_uri=' + encodeURIComponent(redirect_uri)
