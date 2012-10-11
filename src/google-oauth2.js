@@ -3,11 +3,16 @@
   Author: timdream
 
   Usage:
-  GO2.init(client_id, scope, redirect_uri)
-    Initialize the library.
-    redirect_uri is optional, should be any page on the current domain with this library.
-    Default to the current page (window.location.href).
-    This function should be put before Analytics so that the second click won't result a page view register.
+  GO2.init(options)
+    Initialize the library. options is an object with the following properties:
+    - client_id (required)
+    - redirect_uri (optional, default to the current page)
+      To use the current page as the redirect_uri,
+      put this script before Analytics so that the second load won't result
+      a page view register.
+    - scope (optional, default to 'https://www.googleapis.com/auth/plus.me')
+      A string or array indicates the Google API access your application is
+      requesting.
   GO2.getToken(callback)
     Send access token to the callback function as the first argument.
     If not logged in this triggers login popup and execute login after logged in.
@@ -24,11 +29,10 @@
 
   var windowName = 'google_oauth2_login_popup';
 
+  // If the script loads in a popup matches the windowName,
+  // we need to handle the request instead.
   if (w.name === windowName) {
-    if (
-      w.opener &&
-      w.opener.GO2
-    ) {
+    if (w.opener && w.opener.GO2) {
       if (w.location.hash.indexOf('access_token') !== -1) {
         w.opener.GO2.receiveToken(
           w.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
@@ -39,7 +43,10 @@
         w.opener.GO2.receiveToken('ERROR');
       }
     }
+
     w.close();
+
+    return;
   }
 
   var client_id,
@@ -50,10 +57,26 @@
 
   w.GO2 = {
     // init
-    init: function (f_client_id, f_scope, f_redirect_uri) {
-      if (!f_client_id) return false;
-      if (f_scope) scope = f_scope;
-      client_id = f_client_id;
+    init: function (options) {
+      if (!options.client_id)
+        return false;
+
+      // Save the client id;
+      client_id = options.client_id;
+
+      // rewrite scope
+      if (options.scope)
+        scope = options.scope;
+
+      // if scope is an array, convert it into a string.
+      if (scope.constructor === Array)
+        scope = scope.join(' ');
+
+      // rewrite redirect_uri
+      if (options.redirect_uri)
+        redirect_uri = options.redirect_uri;
+
+      return true;
     },
     // receive token from popup
     receiveToken: function (token, expires_in) {
