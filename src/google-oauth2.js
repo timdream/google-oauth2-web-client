@@ -38,7 +38,8 @@
       if (w.location.hash.indexOf('access_token') !== -1) {
         w.opener.GO2.receiveToken(
           w.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
-          parseInt(w.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1'))
+          parseInt(w.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1')),
+          w.location.hash.replace(/^.*state=go2_([^&]+).*$/, '$1')
         );
       }
       if (w.location.search.indexOf('error=')) {
@@ -58,7 +59,7 @@
                                         w.location.hash.length)
                                 .replace(/#$/, ''),
   access_token,
-  callbackWaitForToken;
+  callbacks = {};
 
   w.GO2 = {
     // init
@@ -84,9 +85,12 @@
       return true;
     },
     // receive token from popup
-    receiveToken: function(token, expires_in) {
-      var callback = callbackWaitForToken;
-      callbackWaitForToken = undefined;
+    receiveToken: function(token, expires_in, callback_id) {
+      var callback = callbacks[callback_id];
+      if (!callback)
+        return;
+
+      delete callbacks[callback_id];
 
       if (!token) {
         callback();
@@ -120,12 +124,15 @@
         return callback(access_token);
       }
 
-      callbackWaitForToken = callback;
+      var callback_id = Math.random().toString(32).substr(2);
+
+      callbacks[callback_id] = callback;
       w.open(
         'https://accounts.google.com/o/oauth2/auth' +
         '?response_type=token' +
         '&redirect_uri=' + encodeURIComponent(redirect_uri) +
         '&scope=' + encodeURIComponent(scope) +
+        '&state=go2_' + callback_id +
         '&client_id=' + encodeURIComponent(client_id),
         windowName,
         'width=400,height=360'
