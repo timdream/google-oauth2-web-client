@@ -61,7 +61,7 @@
   access_token,
   callbacks = {};
 
-  w.GO2 = {
+  var GO2 = {
     // init
     init: function(options) {
       if (!options.client_id)
@@ -139,4 +139,12 @@
       );
     }
   };
+
+  // Expose the library as an AMD module
+  if (typeof define === 'function' && define.amd) {
+    define('google-oauth2-web-client', [], function() { return GO2; });
+  } else {
+    w.GO2 = GO2;
+  }
+
 })(this);
