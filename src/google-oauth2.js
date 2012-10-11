@@ -42,7 +42,7 @@
         );
       }
       if (w.location.search.indexOf('error=')) {
-        w.opener.GO2.receiveToken('ERROR');
+        w.opener.GO2.receiveToken(false);
       }
     }
 
@@ -85,18 +85,23 @@
     },
     // receive token from popup
     receiveToken: function(token, expires_in) {
-      if (token !== 'ERROR') {
-        access_token = token;
-        if (callbackWaitForToken) callbackWaitForToken(access_token);
-        setTimeout(
-          function() {
-            access_token = undefined;
-          },
-          expires_in * 1000
-        );
-      } else if (token === false) {
-        callbackWaitForToken = undefined;
+      var callback = callbackWaitForToken;
+      callbackWaitForToken = undefined;
+
+      if (!token) {
+        callback();
+        return;
       }
+
+      access_token = token;
+      callback(access_token);
+
+      setTimeout(
+        function removeToken() {
+          access_token = undefined;
+        },
+        expires_in * 1000
+      );
     },
     // boolean, indicate logged in or not
     isLoggedIn: function() {
@@ -110,20 +115,21 @@
         alert('You need init() first. Check the program flow.');
         return false;
       }
-      if (!access_token) {
-        callbackWaitForToken = callback;
-        w.open(
-          'https://accounts.google.com/o/oauth2/auth' +
-          '?response_type=token' +
-          '&redirect_uri=' + encodeURIComponent(redirect_uri) +
-          '&scope=' + encodeURIComponent(scope) +
-          '&client_id=' + encodeURIComponent(client_id),
-          windowName,
-          'width=400,height=360'
-        );
-      } else {
+
+      if (access_token) {
         return callback(access_token);
       }
+
+      callbackWaitForToken = callback;
+      w.open(
+        'https://accounts.google.com/o/oauth2/auth' +
+        '?response_type=token' +
+        '&redirect_uri=' + encodeURIComponent(redirect_uri) +
+        '&scope=' + encodeURIComponent(scope) +
+        '&client_id=' + encodeURIComponent(client_id),
+        windowName,
+        'width=400,height=360'
+      );
     }
   };
 })(this);
