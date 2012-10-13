@@ -13,16 +13,13 @@
     - scope (optional, default to 'https://www.googleapis.com/auth/plus.me')
       A string or array indicates the Google API access your application is
       requesting.
-  GO2.getToken(callback)
-    Send access token to the callback function as the first argument.
-    If not logged in this triggers login popup and execute login after
-    logged in.
-    Be sure to call this function in user-triggered event (such as click) to
-    prevent popup blocker.
-    If not sure do use isLoggedIn() below to check first.
-  GO2.isLoggedIn()
-    boolean
-
+  GO2.login(approval_prompt, immediate): Log in.
+    Set immediate to true to attempt to login with a invisible frame.
+    Set approval_prompt to true to force the popup prompt.
+  GO2.logout(): Log out.
+  GO2.getAccessToken(): return the token.
+  GO2.onlogin: callback(access_token)
+  GO2.onlogout: callback()
 */
 
 'use strict';
@@ -34,17 +31,21 @@
   // If the script loads in a popup matches the windowName,
   // we need to handle the request instead.
   if (w.name === windowName) {
-    if (w.opener && w.opener.GO2) {
-      if (w.location.hash.indexOf('access_token') !== -1) {
-        w.opener.GO2.receiveToken(
-          w.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
-          parseInt(w.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1')),
-          w.location.hash.replace(/^.*state=go2_([^&]+).*$/, '$1')
-        );
-      }
-      if (w.location.search.indexOf('error=')) {
-        w.opener.GO2.receiveToken(false);
-      }
+    var GO2;
+    if (w.opener && w.opener.GO2)
+      GO2 = w.opener.GO2;
+    if (w.parent && w.parent.GO2)
+      GO2 = w.parent.GO2;
+
+    if (GO2 && w.location.hash.indexOf('access_token') !== -1) {
+      GO2._handleMessage(
+        w.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
+        parseInt(w.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1')),
+        w.location.hash.replace(/^.*state=go2_([^&]+).*$/, '$1')
+      );
+    }
+    if (GO2 && w.location.search.indexOf('error=')) {
+      GO2._handleMessage(false);
     }
 
     w.close();
@@ -59,11 +60,13 @@
                                         w.location.hash.length)
                                 .replace(/#$/, ''),
   access_token,
-  callbacks = {};
+  timer,
+  immediate_frame,
+  state_id = Math.random().toString(32).substr(2);
 
   var GO2 = {
     // init
-    init: function(options) {
+    init: function go2_init(options) {
       if (!options.client_id)
         return false;
 
@@ -84,59 +87,93 @@
 
       return true;
     },
-    // receive token from popup
-    receiveToken: function(token, expires_in, callback_id) {
-      var callback = callbacks[callback_id];
-      if (!callback)
+    login: function go2_login(force_approval_prompt, immediate) {
+      if (access_token)
         return;
 
-      delete callbacks[callback_id];
+      // Remove pending immediate_frame
+      GO2._removeImmediateFrame();
 
-      if (!token) {
-        callback();
+      var url = 'https://accounts.google.com/o/oauth2/auth' +
+        '?response_type=token' +
+        '&redirect_uri=' + encodeURIComponent(redirect_uri) +
+        '&scope=' + encodeURIComponent(scope) +
+        '&state=go2_' + state_id +
+        '&client_id=' + encodeURIComponent(client_id);
+
+      if (!immediate && force_approval_prompt) {
+        url += '&approval_prompt=force';
+      }
+
+      if (immediate) {
+        url += '&approval_prompt=auto';
+
+        // Open up an iframe to login
+        // We might not be able to hear any of the callback
+        // because of X-Frame-Options.
+        immediate_frame = document.createElement('iframe');
+        immediate_frame.src = url;
+        immediate_frame.hidden = true;
+        immediate_frame.width = immediate_frame.height = 1;
+        immediate_frame.name = windowName;
+        document.body.appendChild(immediate_frame);
+
         return;
       }
 
-      access_token = token;
-      callback(access_token);
+      // Open the popup
+      w.open(url, windowName, 'width=500,height=400');
+    },
+    logout: function go2_logout() {
+      if (!access_token)
+        return;
 
-      setTimeout(
-        function removeToken() {
+      // Remove pending immediate_frame
+      GO2._removeImmediateFrame();
+
+      clearTimeout(timer);
+      access_token = undefined;
+      if (GO2.onlogout)
+        GO2.onlogout();
+    },
+    getAccessToken: function go2_getAccessToken() {
+      return access_token;
+    },
+    // receive token from popup / frame
+    _handleMessage: function go2_handleMessage(token, expires_in, s_id) {
+      if (state_id !== s_id)
+        return;
+
+      // Remove pending immediate_frame
+      GO2._removeImmediateFrame();
+
+      // Do nothing if there is no token received.
+      if (!token)
+        return;
+
+      access_token = token;
+
+      if (GO2.onlogin)
+        GO2.onlogin(access_token);
+
+      // Remove the token if timed out.
+      clearTimeout(timer);
+      timer = setTimeout(
+        function tokenTimeout() {
           access_token = undefined;
+          if (GO2.onlogout)
+            GO2.onlogout();
         },
         expires_in * 1000
       );
     },
-    // boolean, indicate logged in or not
-    isLoggedIn: function() {
-      return !!access_token;
-    },
-    // pass the access token to callback
-    // if not logged in this triggers login popup;
-    // use isLoggedIn to check login first to prevent popup blocker
-    getToken: function(callback) {
-      if (!client_id || !redirect_uri || !scope) {
-        alert('You need init() first. Check the program flow.');
-        return false;
-      }
+    // Remove pending immediate_frame
+    _removeImmediateFrame: function go2_removeImmediateFrame() {
+      if (!immediate_frame)
+        return;
 
-      if (access_token) {
-        return callback(access_token);
-      }
-
-      var callback_id = Math.random().toString(32).substr(2);
-
-      callbacks[callback_id] = callback;
-      w.open(
-        'https://accounts.google.com/o/oauth2/auth' +
-        '?response_type=token' +
-        '&redirect_uri=' + encodeURIComponent(redirect_uri) +
-        '&scope=' + encodeURIComponent(scope) +
-        '&state=go2_' + callback_id +
-        '&client_id=' + encodeURIComponent(client_id),
-        windowName,
-        'width=400,height=360'
-      );
+      document.body.removeChild(immediate_frame);
+      immediate_frame = null;
     }
   };
 
