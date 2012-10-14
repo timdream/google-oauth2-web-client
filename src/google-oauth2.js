@@ -130,8 +130,8 @@
       }
 
       // Open the popup
-      var left = (w.screen.width / 2) - (popupWidth / 2);
-      var top = (w.screen.height / 2) - (popupHeight / 2);
+      var left = window.screenX + (window.outerWidth / 2) - (popupWidth / 2);
+      var top = window.screenY + (window.outerHeight / 2) - (popupHeight / 2);
       w.open(url, windowName, 'width=' + popupWidth +
                               ',height=' + popupHeight +
                               ',top=' + top +
