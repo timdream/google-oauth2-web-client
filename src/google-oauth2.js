@@ -135,7 +135,8 @@
       w.open(url, windowName, 'width=' + popupWidth +
                               ',height=' + popupHeight +
                               ',top=' + top +
-                              ',left=' + left);
+                              ',left=' + left +
+                              ',location=yes,toolbar=no,menubar=no');
     },
     logout: function go2_logout() {
       if (!access_token)
