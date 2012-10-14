@@ -13,6 +13,8 @@
     - scope (optional, default to 'https://www.googleapis.com/auth/plus.me')
       A string or array indicates the Google API access your application is
       requesting.
+    - popupWidth
+    - popupHeight
   GO2.login(approval_prompt, immediate): Log in.
     Set immediate to true to attempt to login with a invisible frame.
     Set approval_prompt to true to force the popup prompt.
@@ -62,7 +64,9 @@
   access_token,
   timer,
   immediate_frame,
-  state_id = Math.random().toString(32).substr(2);
+  state_id = Math.random().toString(32).substr(2),
+  popupWidth = 500,
+  popupHeight = 400;
 
   var GO2 = {
     // init
@@ -84,6 +88,10 @@
       // rewrite redirect_uri
       if (options.redirect_uri)
         redirect_uri = options.redirect_uri;
+
+      // popup dimensions
+      popupHeight = options.popupHeight || popupHeight;
+      popupWidth = options.popupWidth || popupWidth;
 
       return true;
     },
@@ -122,7 +130,12 @@
       }
 
       // Open the popup
-      w.open(url, windowName, 'width=500,height=400');
+      var left = (w.screen.width / 2) - (popupWidth / 2);
+      var top = (w.screen.height / 2) - (popupHeight / 2);
+      w.open(url, windowName, 'width=' + popupWidth +
+                              ',height=' + popupHeight +
+                              ',top=' + top +
+                              ',left=' + left);
     },
     logout: function go2_logout() {
       if (!access_token)
