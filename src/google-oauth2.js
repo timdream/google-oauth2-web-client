@@ -71,7 +71,7 @@
   var GO2 = {
     // init
     init: function go2_init(options) {
-      if (!options.client_id)
+      if (!options || !options.client_id)
         return false;
 
       // Save the client id;
