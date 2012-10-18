@@ -20,10 +20,10 @@ test('GO2.init() with client_id should return true', function () {
 
 module('GO2.login() immediate login initiation');
 
-if (!window.location.hash)
-  window.location.hash = '#url-with-hash';
-
 test('GO2.login(false, true) should launch an iframe with correct url', function () {
+  if (!window.location.hash)
+    window.location.hash = '#url-with-hash';
+
   var client_id = fake_client_id;
 
   var returnValue = window.GO2.init(

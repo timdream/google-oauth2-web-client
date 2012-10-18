@@ -2,7 +2,7 @@
 
 module('Interactive login integration');
 
-test('successful login should trigger onlogin callback', function () {
+test('login, get token, logout test', function () {
   var client_id = localhost_client_id;
 
   var returnValue = window.GO2.init({
@@ -15,32 +15,34 @@ test('successful login should trigger onlogin callback', function () {
   window.GO2.login();
 
   stop();
+
+  var onlogin_token;
   window.GO2.onlogin = function (token) {
     window.GO2.onlogin = null;
     ok(!!token, 'Got token from onlogin: ' + token);
+    onlogin_token = token;
 
-    start();
+    setTimeout(continueTest, 10);
   };
-});
 
-test('when logged in, GO2.getAccessToken() should return the token', function () {
-  var token = window.GO2.getAccessToken();
-  ok(!!token, 'Pass with token:' + token);
-});
+  function continueTest() {
+    var token = window.GO2.getAccessToken();
+    ok(!!token, 'GO2.getAccessToken() returns the token:' + token);
 
-test('GO2.logout() should trigger onlogout callback', function () {
-  stop();
+    equal(onlogin_token, token, 'Two tokens are identical.');
 
-  window.GO2.onlogout = function () {
-    window.GO2.onlogout = null;
-    ok(true, 'Passed!');
+    window.GO2.onlogout = function () {
+      window.GO2.onlogout = null;
+      ok(true, 'GO2.logout() triggers onlogout callback');
 
-    start();
+      setTimeout(function () {
+
+        var token = window.GO2.getAccessToken();
+        ok(!token, 'GO2.getAccessToken() does not return the token');
+
+        start();
+      }, 10);
+    };
+    window.GO2.logout();
   };
-  window.GO2.logout();
-});
-
-test('when logged out, GO2.getAccessToken() should not return the token', function () {
-  var token = window.GO2.getAccessToken();
-  ok(!token, 'Not getting token.');
 });
