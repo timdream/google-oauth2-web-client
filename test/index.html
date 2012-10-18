@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>google-oauth2-web-client tests</title>
+  <link rel="stylesheet" href="qunit/qunit/qunit.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <script src="qunit/qunit/qunit.js"></script>
+
+  <!-- sinon -->
+  <script src="sinon/lib/sinon.js"></script>
+  <script src="sinon/lib/sinon/spy.js"></script>
+
+  <!-- script to test -->
+  <script src="../src/google-oauth2.js"></script>
+
+  <!-- testinit -->
+  <script src="testinit.js"></script>
+
+  <!-- test scripts -->
+  <script src="unit/basics.js"></script>
+  <script src="unit/initiation.js"></script>
+  <script src="integration/interactive.js"></script>
+  <script src="integration/immediate.js"></script>
+</body>
+</html>

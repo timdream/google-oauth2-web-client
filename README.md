@@ -32,3 +32,18 @@ You can
 
 - Use the token to request data from Google's server directly from the client-side web app in the browser (with JSON-P or CORS), for example, [this is how HTML Word Cloud does it](https://github.com/timdream/wordcloud/blob/master/jquery.getcontent.js#L124).
 - Send the token to your own server, verify it with Google to associate a Google account with a user session on your site. [Documentation here](https://developers.google.com/accounts/docs/OAuth2Login#validatingtoken).
+
+## Testing
+
+To run tests, first you would need to pull the required QUnit and Sinon.JS library by running
+
+    git submodule init
+    git submodule update
+    
+Then, start a localhost HTTP server, for example,
+
+    python -m SimpleHTTPServer
+    
+Point your browser to [http://127-0-0-1.org.uk:8009/test/](http://127-0-0-1.org.uk:8009/test/) to start testing. You will need to disable popup blocker to properly run the interactive testcases.
+
+You will find all the information you need to write testcases on the [QUnit](http://qunitjs.com) and [Sinon.JS](http://sinonjs.org) website. All code submission are expected to accompany with testcases.
