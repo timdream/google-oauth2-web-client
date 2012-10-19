@@ -42,7 +42,7 @@ To run tests, first you would need to pull the required QUnit and Sinon.JS libra
     
 Then, start a localhost HTTP server, for example,
 
-    python -m SimpleHTTPServer
+    python -m SimpleHTTPServer 8009
     
 Point your browser to [http://127-0-0-1.org.uk:8009/test/](http://127-0-0-1.org.uk:8009/test/) to start testing. You will need to disable popup blocker to properly run the interactive testcases.
 

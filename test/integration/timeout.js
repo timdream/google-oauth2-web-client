@@ -36,7 +36,7 @@ test('login, get token, timeout test', function () {
 
     window.GO2.onlogout = function () {
       window.GO2.onlogout = null;
-      ok(true, 'token timeout triggers onlogout callback');
+      ok(true, 'timeout triggers onlogout callback');
 
       spy.restore();
 
