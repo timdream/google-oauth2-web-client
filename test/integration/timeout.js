@@ -3,25 +3,23 @@
 module('Immediate login integration - timeout test');
 
 test('login, get token, timeout test', function () {
-  var client_id = localhost_client_id;
+  var go2 = new GO2({
+    clientId: LOCALHOST_CLIENT_ID,
+    scope: LOCALHOST_SCOPE,
+    redirectUri: LOCALHOST_REDIRECT_URI
+  });
+  equal(typeof go2, 'object', 'object returns.');
 
-  var returnValue = window.GO2.init({
-      client_id: client_id,
-      scope: localhost_scope,
-      redirect_uri: localhost_redirect_uri
-    });
-  equal(returnValue, true, 'init() returns true.');
-
-  window.GO2.login(false, true);
+  go2.login(false, true);
 
   stop();
 
-  var onlogin_token;
+  var loginCallbackToken;
   var spy;
-  window.GO2.onlogin = function (token) {
-    window.GO2.onlogin = null;
+  go2.onlogin = function (token) {
+    go2.onlogin = null;
     ok(!!token, 'Got token from onlogin: ' + token);
-    onlogin_token = token;
+    loginCallbackToken = token;
 
     setTimeout(continueTest, 10);
 
@@ -29,22 +27,22 @@ test('login, get token, timeout test', function () {
   };
 
   function continueTest() {
-    var token = window.GO2.getAccessToken();
-    ok(!!token, 'GO2.getAccessToken() returns the token:' + token);
+    var token = go2.getAccessToken();
+    ok(!!token, 'go2.getAccessToken() returns the token:' + token);
 
-    equal(onlogin_token, token, 'Two tokens are identical.');
+    equal(loginCallbackToken, token, 'Two tokens are identical.');
 
-    window.GO2.onlogout = function () {
-      window.GO2.onlogout = null;
+    go2.onlogout = function () {
+      go2.onlogout = null;
       ok(true, 'timeout triggers onlogout callback');
 
       spy.restore();
 
       setTimeout(function () {
+        var token = go2.getAccessToken();
+        ok(!token, 'go2.getAccessToken() does not return the token');
 
-        var token = window.GO2.getAccessToken();
-        ok(!token, 'GO2.getAccessToken() does not return the token');
-
+        go2.destory();
         start();
       }, 10);
     };

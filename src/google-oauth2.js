@@ -3,11 +3,12 @@
   Author: timdream
 
   Usage:
-  GO2.init(options)
-    Initialize the library. options is an object with the following properties:
-    - client_id (required)
-    - redirect_uri (optional, default to the current page)
-      To use the current page as the redirect_uri,
+  var go2 = new GO2(options)
+    Create an instance for the library.
+    options is an object with the following properties:
+    - clientId (required)
+    - redirectUri (optional, default to the current page)
+      To use the current page as the redirectUri,
       put this script before Analytics so that the second load won't result
       a page view register.
     - scope (optional, default to 'https://www.googleapis.com/auth/plus.me')
@@ -15,187 +16,208 @@
       requesting.
     - popupWidth
     - popupHeight
-  GO2.login(approval_prompt, immediate): Log in.
+  go2.login(approvalPrompt, immediate): Log in.
     Set immediate to true to attempt to login with a invisible frame.
-    Set approval_prompt to true to force the popup prompt.
-  GO2.logout(): Log out.
-  GO2.getAccessToken(): return the token.
-  GO2.onlogin: callback(access_token)
-  GO2.onlogout: callback()
+    Set approvalPrompt to true to force the popup prompt.
+  go2.logout(): Log out. Note that this does not invalidate access token.
+  go2.getAccessToken(): return the token.
+  go2.onlogin: callback(accessToken)
+  go2.onlogout: callback()
+  go2.destory: remove external references in the DOM for this instance.
 */
 
 'use strict';
 
-(function(w) {
+var GO2 = function GO2(options) {
+  if (!options || !options.clientId)
+    throw 'You need to at least set the clientId';
 
-  var windowName = 'google_oauth2_login_popup';
+  // Save the client id
+  this._clientId = options.clientId;
 
-  // If the script loads in a popup matches the windowName,
-  // we need to handle the request instead.
-  if (w.name === windowName) {
-    var GO2;
-    if (w.opener && w.opener.GO2)
-      GO2 = w.opener.GO2;
-    if (w.parent && w.parent.GO2)
-      GO2 = w.parent.GO2;
-
-    if (GO2 && w.location.hash.indexOf('access_token') !== -1) {
-      GO2._handleMessage(
-        w.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
-        parseInt(w.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1')),
-        w.location.hash.replace(/^.*state=go2_([^&]+).*$/, '$1')
-      );
-    }
-    if (GO2 && w.location.search.indexOf('error=')) {
-      GO2._handleMessage(false);
-    }
-
-    w.close();
-
-    return;
+  // if scope is an array, convert it into a string.
+  if (options.scope) {
+    this._scope =
+      Array.isArray(options.scope) ? options.scope.join(' ') : options.scope;
   }
 
-  var client_id,
-  scope = 'https://www.googleapis.com/auth/plus.me',
-  redirect_uri = w.location.href.substr(0,
-                                        w.location.href.length -
-                                        w.location.hash.length)
-                                .replace(/#$/, ''),
-  access_token,
-  timer,
-  immediate_frame,
-  state_id = Math.random().toString(32).substr(2),
-  popupWidth = 500,
-  popupHeight = 400;
+  // rewrite redirect_uri
+  if (options.redirectUri)
+    this._redirectUri = options.redirectUri;
 
-  var GO2 = {
-    // init
-    init: function go2_init(options) {
-      if (!options || !options.client_id)
-        return false;
+  // popup dimensions
+  if (options.popupHeight)
+    this._popupHeight = options.popupHeight;
+  if (options.popupWidth)
+    this._popupWidth = options.popupWidth;
+};
 
-      // Save the client id;
-      client_id = options.client_id;
+GO2.receiveMessage = function GO2_receiveMessage() {
+  var go2;
+  if (window.opener && window.opener.__windowPendingGO2)
+    go2 = window.opener.__windowPendingGO2;
+  if (window.parent && window.parent.__windowPendingGO2)
+    go2 = window.parent.__windowPendingGO2;
 
-      // rewrite scope
-      if (options.scope)
-        scope = options.scope;
-
-      // if scope is an array, convert it into a string.
-      if (scope.constructor === Array)
-        scope = scope.join(' ');
-
-      // rewrite redirect_uri
-      if (options.redirect_uri)
-        redirect_uri = options.redirect_uri;
-
-      // popup dimensions
-      popupHeight = options.popupHeight || popupHeight;
-      popupWidth = options.popupWidth || popupWidth;
-
-      return true;
-    },
-    login: function go2_login(force_approval_prompt, immediate) {
-      if (access_token)
-        return;
-
-      // Remove pending immediate_frame
-      GO2._removeImmediateFrame();
-
-      var url = 'https://accounts.google.com/o/oauth2/auth' +
-        '?response_type=token' +
-        '&redirect_uri=' + encodeURIComponent(redirect_uri) +
-        '&scope=' + encodeURIComponent(scope) +
-        '&state=go2_' + state_id +
-        '&client_id=' + encodeURIComponent(client_id);
-
-      if (!immediate && force_approval_prompt) {
-        url += '&approval_prompt=force';
-      }
-
-      if (immediate) {
-        url += '&approval_prompt=auto';
-
-        // Open up an iframe to login
-        // We might not be able to hear any of the callback
-        // because of X-Frame-Options.
-        immediate_frame = document.createElement('iframe');
-        immediate_frame.src = url;
-        immediate_frame.hidden = true;
-        immediate_frame.width = immediate_frame.height = 1;
-        immediate_frame.name = windowName;
-        document.body.appendChild(immediate_frame);
-
-        return;
-      }
-
-      // Open the popup
-      var left = window.screenX + (window.outerWidth / 2) - (popupWidth / 2);
-      var top = window.screenY + (window.outerHeight / 2) - (popupHeight / 2);
-      w.open(url, windowName, 'width=' + popupWidth +
-                              ',height=' + popupHeight +
-                              ',top=' + top +
-                              ',left=' + left +
-                              ',location=yes,toolbar=no,menubar=no');
-    },
-    logout: function go2_logout() {
-      if (!access_token)
-        return;
-
-      // Remove pending immediate_frame
-      GO2._removeImmediateFrame();
-
-      clearTimeout(timer);
-      access_token = undefined;
-      if (GO2.onlogout)
-        GO2.onlogout();
-    },
-    getAccessToken: function go2_getAccessToken() {
-      return access_token;
-    },
-    // receive token from popup / frame
-    _handleMessage: function go2_handleMessage(token, expires_in, s_id) {
-      if (state_id !== s_id)
-        return;
-
-      // Remove pending immediate_frame
-      GO2._removeImmediateFrame();
-
-      // Do nothing if there is no token received.
-      if (!token)
-        return;
-
-      access_token = token;
-
-      if (GO2.onlogin)
-        GO2.onlogin(access_token);
-
-      // Remove the token if timed out.
-      clearTimeout(timer);
-      timer = setTimeout(
-        function tokenTimeout() {
-          access_token = undefined;
-          if (GO2.onlogout)
-            GO2.onlogout();
-        },
-        expires_in * 1000
-      );
-    },
-    // Remove pending immediate_frame
-    _removeImmediateFrame: function go2_removeImmediateFrame() {
-      if (!immediate_frame)
-        return;
-
-      document.body.removeChild(immediate_frame);
-      immediate_frame = null;
-    }
-  };
-
-  // Expose the library as an AMD module
-  if (typeof define === 'function' && define.amd) {
-    define('google-oauth2-web-client', [], function() { return GO2; });
-  } else {
-    w.GO2 = GO2;
+  if (go2 && window.location.hash.indexOf('access_token') !== -1) {
+    go2._handleMessage(
+      window.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
+      parseInt(window.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1')),
+      window.location.hash.replace(/^.*state=go2_([^&]+).*$/, '$1')
+    );
   }
+  if (go2 && window.location.search.indexOf('error=')) {
+    go2._handleMessage(false);
+  }
+};
 
-})(this);
+GO2.prototype = {
+  WINDOW_NAME: 'google_oauth2_login_popup',
+
+  _clientId: undefined,
+  _scope: 'https://www.googleapis.com/auth/plus.me',
+  _redirectUri: window.location.href.substr(0,
+                                            window.location.href.length -
+                                            window.location.hash.length)
+                                    .replace(/#$/, ''),
+
+  _popupWindow: null,
+  _immediateFrame: null,
+
+  _stateId: Math.random().toString(32).substr(2),
+  _accessToken: undefined,
+  _timer: undefined,
+
+  _popupWidth: 500,
+  _popupHeight: 400,
+
+  onlogin: null,
+  onlogout: null,
+
+  login: function go2_login(forceApprovalPrompt, immediate) {
+    if (this._accessToken)
+      return;
+
+    this._removePendingWindows();
+
+    window.__windowPendingGO2 = this;
+
+    var url = 'https://accounts.google.com/o/oauth2/auth' +
+      '?response_type=token' +
+      '&redirect_uri=' + encodeURIComponent(this._redirectUri) +
+      '&scope=' + encodeURIComponent(this._scope) +
+      '&state=go2_' + this._stateId +
+      '&client_id=' + encodeURIComponent(this._clientId);
+
+    if (!immediate && forceApprovalPrompt) {
+      url += '&approval_prompt=force';
+    }
+
+    if (immediate) {
+      url += '&approval_prompt=auto';
+
+      // Open up an iframe to login
+      // We might not be able to hear any of the callback
+      // because of X-Frame-Options.
+      var immediateFrame =
+        this._immediateFrame = document.createElement('iframe');
+      immediateFrame.src = url;
+      immediateFrame.hidden = true;
+      immediateFrame.width = immediateFrame.height = 1;
+      immediateFrame.name = this.WINDOW_NAME;
+      document.body.appendChild(immediateFrame);
+
+      return;
+    }
+
+    // Open the popup
+    var left =
+      window.screenX + (window.outerWidth / 2) - (this._popupWidth / 2);
+    var top =
+      window.screenY + (window.outerHeight / 2) - (this._popupHeight / 2);
+    var windowFeatures = 'width=' + this._popupWidth +
+                   ',height=' + this._popupHeight +
+                   ',top=' + top +
+                   ',left=' + left +
+                   ',location=yes,toolbar=no,menubar=no';
+    this._popupWindow = window.open(url, this.WINDOW_NAME, windowFeatures);
+  },
+
+  logout: function go2_logout() {
+    if (!this._accessToken)
+      return;
+
+    this._removePendingWindows();
+
+    clearTimeout(this._timer);
+    this._accessToken = undefined;
+    if (this.onlogout)
+      this.onlogout();
+  },
+
+  getAccessToken: function go2_getAccessToken() {
+    return this._accessToken;
+  },
+
+  // receive token from popup / frame
+  _handleMessage: function go2_handleMessage(token, expiresIn, stateId) {
+    if (this._stateId !== stateId)
+      return;
+
+    this._removePendingWindows();
+
+    // Do nothing if there is no token received.
+    if (!token)
+      return;
+
+    this._accessToken = token;
+
+    if (this.onlogin)
+      this.onlogin(this._accessToken);
+
+    // Remove the token if timed out.
+    clearTimeout(this._timer);
+    this._timer = setTimeout(
+      function tokenTimeout() {
+        this._accessToken = undefined;
+        if (this.onlogout)
+          this.onlogout();
+      }.bind(this),
+      expiresIn * 1000
+    );
+  },
+
+  destory: function go2_destory() {
+    clearTimeout(this._timer);
+    this._removePendingWindows();
+  },
+
+  _removePendingWindows: function go2_removePendingWindows() {
+    if (this._immediateFrame) {
+      document.body.removeChild(this._immediateFrame);
+      this._immediateFrame = null;
+    }
+
+    if (this._popupWindow) {
+      this._popupWindow.close();
+      this._popupWindow = null;
+    }
+
+    if (window.__windowPendingGO2 === this) {
+      delete window.__windowPendingGO2;
+    }
+  }
+};
+
+// If the script loads in a popup matches the WINDOW_NAME,
+// we need to handle the request instead.
+if (window.name === GO2.prototype.WINDOW_NAME) {
+  GO2.receiveMessage();
+}
+
+// Expose the library as an AMD module
+if (typeof define === 'function' && define.amd) {
+  define('google-oauth2-web-client', [], function() { return GO2; });
+} else {
+  window.GO2 = GO2;
+}

@@ -7,12 +7,12 @@ This library is a spin-off project from [HTML5 Word Cloud](https://github.com/ti
 ## Simple usage
 
 1. Load the script with `<script>` or as an AMD module.
-2. Initialize the library with `GO2.init(options)`, where options should contain at least the `client_id` you got from the Google [API Console](https://code.google.com/apis/console#access).
-3. Attach your callbacks to `GO2.onlogin` and `GO2.onlogout`.
-You will be able to get the `access_token` from `onlogin` callback or from the `GO2.getAccessToken()` method.
-4. (Immediate mode) At this point, you may call `GO2.login(false, true)` and to silently test and regain the previous approvial.
+2. Create an instance of the library with `var go2 = GO2.init(options)`, where options should contain at least the `clientId` you got from the Google [API Console](https://code.google.com/apis/console#access).
+3. Attach your callbacks to `go2.onlogin` and `go2.onlogout`.
+You will be able to get the `accessToken` from `onlogin` callback or from the `GO2.getAccessToken()` method.
+4. (Immediate mode) At this point, you may call `go2.login(false, true)` and to silently test and regain the previous approvial.
 If it's approved, `onlogin` callback will fire.
-5. Call `GO2.login()` to start an interactive login process, with a popup.
+5. Call `go2.login()` to start an interactive login process, with a popup.
 The call must be a result of a user action, such as a click, to prevent popup blocker.
 
 Check out comments in the script source code for detail.
@@ -26,7 +26,7 @@ For some reason, I cannot get `auth` library to load without getting the entire 
 
 You are very welcome to use the library from Google since it will be better supported.
 
-### What can I do with the `access_token` I got once the login is completed?
+### What can I do with the `accessToken` I got once the login is completed?
 
 You can
 

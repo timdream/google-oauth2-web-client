@@ -1,15 +1,15 @@
 'use strict';
 
-var localhost_client_id = '519733320959.apps.googleusercontent.com';
-var localhost_scope = ['https://www.googleapis.com/auth/userinfo.profile',
+var LOCALHOST_CLIENT_ID = '519733320959.apps.googleusercontent.com';
+var LOCALHOST_SCOPE = ['https://www.googleapis.com/auth/userinfo.profile',
   'https://www.googleapis.com/auth/userinfo.email'];
-var localhost_redirect_uri = 'http://127-0-0-1.org.uk:8009/test/';
+var LOCALHOST_REDIRECT_URI = 'http://127-0-0-1.org.uk:8009/test/';
 
 // The fake one allows Google to show an error page without log us in automatically
-var fake_client_id = 'not-valid.apps.googleusercontent.com';
+var FAKE_CLIENT_ID = 'not-valid.apps.googleusercontent.com';
 
-var apiUrl = 'https://accounts.google.com/o/oauth2/auth';
-var defaultScope = 'https://www.googleapis.com/auth/plus.me';
+var API_URL = 'https://accounts.google.com/o/oauth2/auth';
+var DEFAULT_SCOPE = 'https://www.googleapis.com/auth/plus.me';
 
 function splitUrlArgs(urlArgs) {
   var urlArgKeys = [];
@@ -33,6 +33,6 @@ test('Testing environment test', function () {
   if (win && win.close)
     win.close();
 
-  equal(window.location.href.substr(0, localhost_redirect_uri.length), localhost_redirect_uri,
+  equal(window.location.href.substr(0, LOCALHOST_REDIRECT_URI.length), LOCALHOST_REDIRECT_URI,
         'Integration will work; test is running on presumed URL.');
 });
