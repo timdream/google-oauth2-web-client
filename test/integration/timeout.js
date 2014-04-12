@@ -18,7 +18,12 @@ test('login, get token, timeout test', function () {
   var spy;
   go2.onlogin = function (token) {
     go2.onlogin = null;
-    ok(!!token, 'Got token from onlogin: ' + token);
+    if (LOCALTEST) {
+      equal(token, 'FAKE_ACCESS_TOKEN_FROM_FAKE_OAUTH',
+        'Got token from fake oauth');
+    } else {
+      ok(!!token, 'Got token from Google: ' + token);
+    }
     loginCallbackToken = token;
 
     setTimeout(continueTest, 10);

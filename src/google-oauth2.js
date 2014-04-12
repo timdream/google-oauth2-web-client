@@ -82,6 +82,7 @@ GO2.receiveMessage = function GO2_receiveMessage() {
 
 GO2.prototype = {
   WINDOW_NAME: 'google_oauth2_login_popup',
+  OAUTH_URL: 'https://accounts.google.com/o/oauth2/auth',
 
   _clientId: undefined,
   _scope: 'https://www.googleapis.com/auth/plus.me',
@@ -112,7 +113,7 @@ GO2.prototype = {
 
     window.__windowPendingGO2 = this;
 
-    var url = 'https://accounts.google.com/o/oauth2/auth' +
+    var url = this.OAUTH_URL +
       '?response_type=token' +
       '&redirect_uri=' + encodeURIComponent(this._redirectUri) +
       '&scope=' + encodeURIComponent(this._scope) +

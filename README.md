@@ -44,6 +44,14 @@ Then, start a localhost HTTP server, for example,
 
     python -m SimpleHTTPServer 8009
 
+### Test with local fake OAuth endpoint
+
+Point your browser to [http://localhost:8009/test/?localtest=true](http://localhost:8009/test/?localtest=true) to start testing. You will need to disable popup blocker to properly run the interactive testcases.
+
+### Test with the real Google OAuth endpoint
+
 Point your browser to [http://127-0-0-1.org.uk:8009/test/](http://127-0-0-1.org.uk:8009/test/) to start testing. You will need to disable popup blocker to properly run the interactive testcases.
+
+## Writing tests
 
 You will find all the information you need to write testcases on the [QUnit](http://qunitjs.com) and [Sinon.JS](http://sinonjs.org) website. All code submission are expected to accompany with testcases.

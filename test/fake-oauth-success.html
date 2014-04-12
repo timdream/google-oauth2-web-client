@@ -1,0 +1,20 @@
+<script>
+  var searchParams = {};
+
+  window.location.search.substr(1).split('&').forEach(function(keyValue) {
+    var arr = keyValue.split('=');
+    searchParams[decodeURIComponent(arr[0])] = decodeURIComponent(arr[1]);
+  });
+
+  var LOCALHOST_CLIENT_ID = '519733320959.apps.googleusercontent.com';
+
+  if (searchParams['client_id'] === LOCALHOST_CLIENT_ID) {
+    window.location.href = searchParams['redirect_uri'] +
+      '#state=' + searchParams['state'] +
+      '&access_token=FAKE_ACCESS_TOKEN_FROM_FAKE_OAUTH' +
+      '&token_type=Bearer&expires_in=3600';
+  } else {
+    alert('Incorrect client_id.');
+  }
+
+</script>
