@@ -26,11 +26,14 @@
   go2.destory: remove external references in the DOM for this instance.
 */
 
+/* global define */
+
 'use strict';
 
 var GO2 = function GO2(options) {
-  if (!options || !options.clientId)
+  if (!options || !options.clientId) {
     throw 'You need to at least set the clientId';
+  }
 
   // Save the client id
   this._clientId = options.clientId;
@@ -42,22 +45,27 @@ var GO2 = function GO2(options) {
   }
 
   // rewrite redirect_uri
-  if (options.redirectUri)
+  if (options.redirectUri) {
     this._redirectUri = options.redirectUri;
+  }
 
   // popup dimensions
-  if (options.popupHeight)
+  if (options.popupHeight) {
     this._popupHeight = options.popupHeight;
-  if (options.popupWidth)
+  }
+  if (options.popupWidth) {
     this._popupWidth = options.popupWidth;
+  }
 };
 
 GO2.receiveMessage = function GO2_receiveMessage() {
   var go2;
-  if (window.opener && window.opener.__windowPendingGO2)
+  if (window.opener && window.opener.__windowPendingGO2) {
     go2 = window.opener.__windowPendingGO2;
-  if (window.parent && window.parent.__windowPendingGO2)
+  }
+  if (window.parent && window.parent.__windowPendingGO2) {
     go2 = window.parent.__windowPendingGO2;
+  }
 
   if (go2 && window.location.hash.indexOf('access_token') !== -1) {
     go2._handleMessage(
@@ -95,8 +103,9 @@ GO2.prototype = {
   onlogout: null,
 
   login: function go2_login(forceApprovalPrompt, immediate) {
-    if (this._accessToken)
+    if (this._accessToken) {
       return;
+    }
 
     this._removePendingWindows();
 
@@ -144,15 +153,17 @@ GO2.prototype = {
   },
 
   logout: function go2_logout() {
-    if (!this._accessToken)
+    if (!this._accessToken) {
       return;
+    }
 
     this._removePendingWindows();
 
     clearTimeout(this._timer);
     this._accessToken = undefined;
-    if (this.onlogout)
+    if (this.onlogout) {
       this.onlogout();
+    }
   },
 
   getAccessToken: function go2_getAccessToken() {
@@ -161,27 +172,31 @@ GO2.prototype = {
 
   // receive token from popup / frame
   _handleMessage: function go2_handleMessage(token, expiresIn, stateId) {
-    if (this._stateId !== stateId)
+    if (this._stateId !== stateId) {
       return;
+    }
 
     this._removePendingWindows();
 
     // Do nothing if there is no token received.
-    if (!token)
+    if (!token) {
       return;
+    }
 
     this._accessToken = token;
 
-    if (this.onlogin)
+    if (this.onlogin) {
       this.onlogin(this._accessToken);
+    }
 
     // Remove the token if timed out.
     clearTimeout(this._timer);
     this._timer = setTimeout(
       function tokenTimeout() {
         this._accessToken = undefined;
-        if (this.onlogout)
+        if (this.onlogout) {
           this.onlogout();
+        }
       }.bind(this),
       expiresIn * 1000
     );
