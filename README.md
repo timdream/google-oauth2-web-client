@@ -1,6 +1,6 @@
 # google-oauth2-web-client
 
-[![Code Climate](https://codeclimate.com/github/timdream/google-oauth2-web-client.png)](https://codeclimate.com/github/timdream/google-oauth2-web-client)
+[![Code Climate](https://codeclimate.com/github/timdream/google-oauth2-web-client.png)](https://codeclimate.com/github/timdream/google-oauth2-web-client) [![Build Status](https://travis-ci.org/timdream/google-oauth2-web-client.svg?branch=master)](https://travis-ci.org/timdream/google-oauth2-web-client)
 
 Login with Google using OAuth2 for client-side web app, completes login flow discribed in [Using OAuth 2.0 for Client-side Applications](https://developers.google.com/accounts/docs/OAuth2UserAgent).
 
