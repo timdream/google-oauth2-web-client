@@ -67,11 +67,12 @@ GO2.receiveMessage = function GO2_receiveMessage() {
     go2 = window.parent.__windowPendingGO2;
   }
 
-  if (go2 && window.location.hash.indexOf('access_token') !== -1) {
+  var hash = window.location.hash;
+  if (go2 && hash.indexOf('access_token') !== -1) {
     go2._handleMessage(
-      window.location.hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
-      parseInt(window.location.hash.replace(/^.*expires_in=([^&]+).*$/, '$1')),
-      window.location.hash.replace(/^.*state=go2_([^&]+).*$/, '$1')
+      hash.replace(/^.*access_token=([^&]+).*$/, '$1'),
+      parseInt(hash.replace(/^.*expires_in=([^&]+).*$/, '$1'), 10),
+      hash.replace(/^.*state=go2_([^&]+).*$/, '$1')
     );
   }
   if (go2 && window.location.search.indexOf('error=')) {
