@@ -27,6 +27,7 @@ if (window.location.search.indexOf('localtest=true') !== -1) {
       urlUtil = new window.URL(FAKE_LOCAL_API_URL, window.location);
     } else {
       urlUtil = document.createElement('a');
+      urlUtil.href = FAKE_LOCAL_API_URL;
     }
 
     return urlUtil.href;
