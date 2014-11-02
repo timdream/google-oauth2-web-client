@@ -26,7 +26,7 @@
   go2.destory: remove external references in the DOM for this instance.
 */
 
-/* global define */
+/* global define, module, require */
 
 'use strict';
 
@@ -235,6 +235,13 @@ if (window.name === GO2.prototype.WINDOW_NAME) {
 // Expose the library as an AMD module
 if (typeof define === 'function' && define.amd) {
   define('google-oauth2-web-client', [], function() { return GO2; });
+} else if (typeof module === 'object' && typeof require === 'function') {
+  // export GO2 in Node.js, assuming we are being browserify'd.
+  module.exports = GO2;
+
+  if (require.main === module) {
+    console.error('Error: GO2 is not meant to be executed directly.');
+  }
 } else {
   window.GO2 = GO2;
 }

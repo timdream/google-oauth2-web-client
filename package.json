@@ -1,5 +1,6 @@
 {
   "name": "google-oauth2-web-client",
+  "main": "src/google-oauth2.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/timdream/google-oauth2-web-client.git"
