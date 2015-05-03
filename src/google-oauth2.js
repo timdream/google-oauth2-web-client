@@ -34,7 +34,12 @@ var GO2 = function GO2(options) {
   if (!options || !options.clientId) {
     throw 'You need to at least set the clientId';
   }
-
+    if(typeof window != 'undefined'){
+        this._redirectUri = window.location.href.substr(0,
+            window.location.href.length -
+            window.location.hash.length)
+            .replace(/#$/, '')
+    }
   // Save the client id
   this._clientId = options.clientId;
 
@@ -86,10 +91,7 @@ GO2.prototype = {
 
   _clientId: undefined,
   _scope: 'https://www.googleapis.com/auth/plus.me',
-  _redirectUri: window.location.href.substr(0,
-                                            window.location.href.length -
-                                            window.location.hash.length)
-                                    .replace(/#$/, ''),
+  _redirectUri: '',
 
   _popupWindow: null,
   _immediateFrame: null,
@@ -226,10 +228,13 @@ GO2.prototype = {
   }
 };
 
-// If the script loads in a popup matches the WINDOW_NAME,
-// we need to handle the request instead.
-if (window.name === GO2.prototype.WINDOW_NAME) {
-  GO2.receiveMessage();
+//Only if the context is the browser
+if(typeof window != 'undefined '){
+    // If the script loads in a popup matches the WINDOW_NAME,
+    // we need to handle the request instead.
+    if (window.name === GO2.prototype.WINDOW_NAME) {
+      GO2.receiveMessage();
+    }
 }
 
 // Expose the library as an AMD module
