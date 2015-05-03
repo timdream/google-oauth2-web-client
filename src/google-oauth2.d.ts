@@ -6,8 +6,8 @@ interface GoogleOAuth2Options{
     clientId: string
     redirectUri?: string;
     scope?: string | string[];
-    popupHeight:number;
-    popupWidth:number;
+    popupHeight?:number;
+    popupWidth?:number;
 }
 declare class GoogleOAuth2{
     constructor(options:GoogleOAuth2Options);
