@@ -229,7 +229,7 @@ GO2.prototype = {
 };
 
 //Only if the context is the browser
-if (typeof window != 'undefined ') {
+if (typeof window != 'undefined') {
     // If the script loads in a popup matches the WINDOW_NAME,
     // we need to handle the request instead.
     if (window.name === GO2.prototype.WINDOW_NAME) {
