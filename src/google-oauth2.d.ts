@@ -12,7 +12,7 @@ interface GoogleOAuth2Options{
 declare class GoogleOAuth2{
     constructor(options:GoogleOAuth2Options);
     public onlogout:()=>void;
-    public onlogin:()=>void;
+    public onlogin:(accessToken:string)=>void;
     getAccessToken();
     login(approvalPrompt?:boolean, immediate?:boolean);
     logout();
