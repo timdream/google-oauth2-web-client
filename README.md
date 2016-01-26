@@ -9,10 +9,10 @@ This library is a spin-off project from [HTML5 Word Cloud](https://github.com/ti
 ## Simple usage
 
 1. Load the script with `<script>` or as an AMD module.
-2. Create an instance of the library with `var go2 = GO2.init(options)`, where options should contain at least the `clientId` you got from the Google [API Console](https://code.google.com/apis/console#access).
+2. Create an instance of the library with `var go2 = new GO2(options)`, where options should contain at least the `clientId` you got from the Google [API Console](https://code.google.com/apis/console#access).
 3. Attach your callbacks to `go2.onlogin` and `go2.onlogout`.
-You will be able to get the `accessToken` from `onlogin` callback or from the `GO2.getAccessToken()` method.
-4. (Immediate mode) At this point, you may call `go2.login(false, true)` and to silently test and regain the previous approvial.
+You will be able to get the `accessToken` from `onlogin` callback or from the `go2.getAccessToken()` method.
+4. (Immediate mode) At this point, you may call `go2.login(false, true)` and to silently test and regain the previous approval.
 If it's approved, `onlogin` callback will fire.
 5. Call `go2.login()` to start an interactive login process, with a popup.
 The call must be a result of a user action, such as a click, to prevent popup blocker.
@@ -24,7 +24,7 @@ Check out comments in the script source code for detail.
 ### Why not use [library supplied by Google](https://code.google.com/p/google-api-javascript-client/wiki/Authentication) and reinvent the wheel?
 
 Because I can; also because the library is light-weighted and transparent to me.
-For some reason, I cannot get `auth` library to load without getting the entire client library; onload callback never fires.
+For some reason, I cannot get `auth` library to load without getting the entire client library; `onload` callback never fires.
 
 You are very welcome to use the library from Google since it will be better supported.
 
@@ -48,12 +48,12 @@ Then, start a localhost HTTP server, for example,
 
 ### Test with local fake OAuth endpoint
 
-Point your browser to [http://localhost:8009/test/?localtest=true](http://localhost:8009/test/?localtest=true) to start testing. You will need to disable popup blocker to properly run the interactive testcases.
+Point your browser to [http://localhost:8009/test/?localtest=true](http://localhost:8009/test/?localtest=true) to start testing. You will need to disable popup blocker to properly run the interactive test cases.
 
 ### Test with the real Google OAuth endpoint
 
-Point your browser to [http://127-0-0-1.org.uk:8009/test/](http://127-0-0-1.org.uk:8009/test/) to start testing. You will need to disable popup blocker to properly run the interactive testcases.
+Point your browser to [http://127-0-0-1.org.uk:8009/test/](http://127-0-0-1.org.uk:8009/test/) to start testing. You will need to disable popup blocker to properly run the interactive test cases.
 
 ## Writing tests
 
-You will find all the information you need to write testcases on the [QUnit](http://qunitjs.com) and [Sinon.JS](http://sinonjs.org) website. All code submission are expected to accompany with testcases.
+You will find all the information you need to write test cases on the [QUnit](http://qunitjs.com) and [Sinon.JS](http://sinonjs.org) website. All code submission are expected to accompany with test cases.
