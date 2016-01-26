@@ -1,6 +1,6 @@
 {
   "name": "google-oauth2-web-client",
-  "version" : "0.1.0-dev",
+  "version" : "0.1.1",
   "description" : "Login with Google using OAuth2 for client-side web app",
   "main": "src/google-oauth2.js",
   "repository": {
