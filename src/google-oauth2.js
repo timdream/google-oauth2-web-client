@@ -56,6 +56,10 @@ var GO2 = function GO2(options) {
   if (options.popupWidth) {
     this._popupWidth = options.popupWidth;
   }
+
+  if (options.responseType) {
+    this._responseType = options.responseType;
+  }
 };
 
 GO2.receiveMessage = function GO2_receiveMessage() {
@@ -75,6 +79,15 @@ GO2.receiveMessage = function GO2_receiveMessage() {
       hash.replace(/^.*state=go2_([^&]+).*$/, '$1')
     );
   }
+
+  if (go2 && window.location.search.indexOf('code=')) {
+    go2._handleMessage(
+      window.location.search.replace(/^.*code=([^&]+).*$/, '$1'),
+      null,
+      window.location.search.replace(/^.*state=go2_([^&]+).*$/, '$1')
+    );
+  }
+
   if (go2 && window.location.search.indexOf('error=')) {
     go2._handleMessage(false);
   }
@@ -82,7 +95,7 @@ GO2.receiveMessage = function GO2_receiveMessage() {
 
 GO2.prototype = {
   WINDOW_NAME: 'google_oauth2_login_popup',
-  OAUTH_URL: 'https://accounts.google.com/o/oauth2/auth',
+  OAUTH_URL: 'https://accounts.google.com/o/oauth2/v2/auth',
 
   _clientId: undefined,
   _scope: 'https://www.googleapis.com/auth/plus.me',
@@ -101,6 +114,8 @@ GO2.prototype = {
   _popupWidth: 500,
   _popupHeight: 400,
 
+  _responseType: 'token',
+
   onlogin: null,
   onlogout: null,
 
@@ -114,7 +129,7 @@ GO2.prototype = {
     window.__windowPendingGO2 = this;
 
     var url = this.OAUTH_URL +
-      '?response_type=token' +
+      '?response_type=' + this._responseType +
       '&redirect_uri=' + encodeURIComponent(this._redirectUri) +
       '&scope=' + encodeURIComponent(this._scope) +
       '&state=go2_' + this._stateId +
@@ -191,21 +206,25 @@ GO2.prototype = {
       this.onlogin(this._accessToken);
     }
 
-    // Remove the token if timed out.
-    clearTimeout(this._timer);
-    this._timer = setTimeout(
-      function tokenTimeout() {
-        this._accessToken = undefined;
-        if (this.onlogout) {
-          this.onlogout();
-        }
-      }.bind(this),
-      expiresIn * 1000
-    );
+    if (expiresIn) {
+      // Remove the token if timed out.
+      clearTimeout(this._timer);
+      this._timer = setTimeout(
+        function tokenTimeout() {
+          this._accessToken = undefined;
+          if (this.onlogout) {
+            this.onlogout();
+          }
+        }.bind(this),
+        expiresIn * 1000
+      );
+    }
   },
 
   destory: function go2_destory() {
-    clearTimeout(this._timer);
+    if (this._timer) {
+      clearTimeout(this._timer);
+    }
     this._removePendingWindows();
   },
 
