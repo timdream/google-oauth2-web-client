@@ -40,8 +40,9 @@ var GO2 = function GO2(options) {
 
     // if scope is an array, convert it into a string.
     if (options.scope) {
-        this._scope =
-            Array.isArray(options.scope) ? options.scope.join(' ') : options.scope;
+        this._scope = Array.isArray(options.scope) ?
+            options.scope.join(' ') :
+            options.scope;
     }
 
     // rewrite redirect_uri
