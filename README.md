@@ -22,7 +22,7 @@ Check out comments in the script source code for detail.
 ##Options 
  * clientId: string (required)
  * redirectUri: string (optional)
- * scope: string | string[] (optional)
+ * scope: string | string\[\] (optional)
  * popupHeight: number (optional)
  * popupWidth: number (optional)
  * responseType: string (optional)
