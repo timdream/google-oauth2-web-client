@@ -1,7 +1,7 @@
 {
   "name": "google-oauth2-web-client",
-  "version" : "0.1.0-dev",
-  "description" : "Login with Google using OAuth2 for client-side web app",
+  "version": "0.1.2",
+  "description": "Login with Google using OAuth2 for client-side web app",
   "main": "src/google-oauth2.js",
   "repository": {
     "type": "git",
@@ -18,8 +18,8 @@
     "grunt-contrib-jshint": "~0.10.0"
   },
   "licenses": [{
-    "type" : "MIT",
-    "url" : "https://github.com/timdream/google-oauth2-web-client/blob/master/LICENSE"
+      "type": "MIT",
+      "url": "https://github.com/timdream/google-oauth2-web-client/blob/master/LICENSE"
   }],
   "keywords": [
     "google",
@@ -29,11 +29,14 @@
   "author": {
     "name": "Timothy Guan-tin Chien",
     "email": "timdream@gmail.com",
-    "url" : "http://timdream.org/"
+    "url": "http://timdream.org/"
   },
-  "maintainers": [{
-    "name": "Timothy Guan-tin Chien",
-    "email": "timdream@gmail.com",
-    "url" : "http://timdream.org/"
-  }]
+  "maintainers": [
+    {
+      "name": "Timothy Guan-tin Chien",
+      "email": "timdream@gmail.com",
+      "url": "http://timdream.org/"
+    }
+  ],
+  "typings": "src/google-oauth2.d.ts"
 }

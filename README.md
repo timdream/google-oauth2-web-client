@@ -19,6 +19,17 @@ The call must be a result of a user action, such as a click, to prevent popup bl
 
 Check out comments in the script source code for detail.
 
+##Options 
+ * clientId: string (required)
+ * redirectUri: string (optional)
+ * scope: string | string[] (optional)
+ * popupHeight: number (optional)
+ * popupWidth: number (optional)
+ * responseType: string (optional)
+ * accessType: string (optional)
+
+
+
 ## FAQ
 
 ### Why not use [library supplied by Google](https://code.google.com/p/google-api-javascript-client/wiki/Authentication) and reinvent the wheel?
@@ -28,12 +39,15 @@ For some reason, I cannot get `auth` library to load without getting the entire 
 
 You are very welcome to use the library from Google since it will be better supported.
 
-### What can I do with the `accessToken` I got once the login is completed?
+### What can I do with the `accessToken` or `code` I got once the login is completed?
 
 You can
 
 - Use the token to request data from Google's server directly from the client-side web app in the browser (with JSON-P or CORS), for example, [this is how HTML5 Word Cloud does it](https://github.com/timdream/wordcloud/blob/3f358236/assets/fetchers.js#L263-L313).
 - Send the token to your own server, verify it with Google to associate a Google account with a user session on your site. [Documentation here](https://developers.google.com/accounts/docs/OAuth2Login#validatingtoken).
+
+### Typescript support 
+Include the *src/google-oauth2.d.ts* for Typescript support.
 
 ## Testing
 
