@@ -19,6 +19,17 @@ The call must be a result of a user action, such as a click, to prevent popup bl
 
 Check out comments in the script source code for detail.
 
+##Options 
+ * clientId: string (required)
+ * redirectUri: string (optional)
+ * scope: string | string\[\] (optional)
+ * popupHeight: number (optional)
+ * popupWidth: number (optional)
+ * responseType: string (optional)
+ * accessType: string (optional)
+
+
+
 ## FAQ
 
 ### Why not use [library supplied by Google](https://code.google.com/p/google-api-javascript-client/wiki/Authentication) and reinvent the wheel?
@@ -28,12 +39,15 @@ For some reason, I cannot get `auth` library to load without getting the entire 
 
 You are very welcome to use the library from Google since it will be better supported.
 
-### What can I do with the `accessToken` I got once the login is completed?
+### What can I do with the `accessToken` or `code` I got once the login is completed?
 
 You can
 
 - Use the token to request data from Google's server directly from the client-side web app in the browser (with JSON-P or CORS), for example, [this is how HTML5 Word Cloud does it](https://github.com/timdream/wordcloud/blob/3f358236/assets/fetchers.js#L263-L313).
 - Send the token to your own server, verify it with Google to associate a Google account with a user session on your site. [Documentation here](https://developers.google.com/accounts/docs/OAuth2Login#validatingtoken).
+
+### Typescript support 
+Include the *src/google-oauth2.d.ts* for Typescript support.
 
 ## Testing
 
@@ -57,3 +71,33 @@ Point your browser to [http://127-0-0-1.org.uk:8009/test/](http://127-0-0-1.org.
 ## Writing tests
 
 You will find all the information you need to write test cases on the [QUnit](http://qunitjs.com) and [Sinon.JS](http://sinonjs.org) website. All code submission are expected to accompany with test cases.
+
+
+## Auther
+[***Timothy Guan-tin Chien***](https://timdream.org)
+
+## Contributors
+ * [***Asaduzzaman Pavel***](http://www.codegenie.co)
+ * [***Stefan Bieliauskas***](https://github.com/B-Stefan)
+
+## License
+
+Copyright (c) 2016 Timothy Guan-tin Chien
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
