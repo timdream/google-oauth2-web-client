@@ -1,6 +1,6 @@
 {
   "name": "google-oauth2-web-client",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Login with Google using OAuth2 for client-side web app",
   "main": "src/google-oauth2.js",
   "repository": {
@@ -17,10 +17,12 @@
     "grunt-contrib-connect": "~0.3.0",
     "grunt-contrib-jshint": "~0.10.0"
   },
-  "licenses": [{
+  "licenses": [
+    {
       "type": "MIT",
       "url": "https://github.com/timdream/google-oauth2-web-client/blob/master/LICENSE"
-  }],
+    }
+  ],
   "keywords": [
     "google",
     "oauth2",
