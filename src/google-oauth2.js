@@ -180,7 +180,7 @@ GO2.prototype = {
             ',height=' + this._popupHeight +
             ',top=' + top +
             ',left=' + left +
-            ',location=yes,toolbar=no,menubar=no';
+            ',location=no,toolbar=no,menubar=no';
         this._popupWindow = window.open(url, this.WINDOW_NAME, windowFeatures);
     },
 
